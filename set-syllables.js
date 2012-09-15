@@ -1,8 +1,28 @@
+regex = {
+  vowels: 'AE|EY|AO|AX|IY|EH|IH|AY|IX|AA|UW|UH|UX|OW|AW|OY',
+  consonants: 'b|C|d|D|f|g|h|J|k|l|m|n|N|p|r|s|S|t|T|v|w|y|z|Z',
+  punctuation: '\\.|!|\\?|,|:',
+  stress: '~|_|\\+|=',
+};
+
+re = {
+    vowels: new RegExp(regex.vowels),
+    consonants: new RegExp(regex.consonants),
+    stress: new RegExp(regex.stress),
+};
+
+shaveDecimals = function(value, numDecimals) {
+    var multiplier = Math.pow(10, numDecimals);
+    return Math.round(multiplier * value) / multiplier;
+}
+
 SetSyllables = {
+    VOWEL_SHARE: 0.25, // consonants will cede this much of a crowded note
+
     parseTuneEntry: function(tuneEntry) {
 	var result = {};
-	var re = new RegExp("([^ ]+) {D [0-9.]+; P( [0-9.]+;[0-9.]+)+}");
 	var matches = tuneEntry.match(/([^ ]+) {D ([0-9.]+); P ([^}]+)}/);
+	if (!matches || matches.length < 4) return tuneEntry;
 	result.phoneme = matches[1];
 	result.duration = matches[2];
 	result.pitches = matches[3].split(" ");
@@ -12,7 +32,12 @@ SetSyllables = {
 	return result;
     },
 
+    isParsedPhoneme: function(tuneEntry) {
+	return typeof(tuneEntry) == 'object' && 'pitches' in tuneEntry;
+    },
+
     tuneEntryToString: function(tuneEntry) {
+	if (!this.isParsedPhoneme(tuneEntry)) return tuneEntry;
 	result = tuneEntry.phoneme +
 	    " {D " + tuneEntry.duration + "; P";
 	for (var i = 0; i < tuneEntry.pitches.length; i++) {
@@ -22,56 +47,154 @@ SetSyllables = {
 	return result;
     },
 
-    setConsonant: function(tuneEntry, pitchFactor) {
-	tuneEntry = this.parseTuneEntry(tuneEntry);
+    setConsonant: function(tuneEntry, pitchFactor, timeFactor) {
+	if (typeof(timeFactor) === 'undefined') timeFactor = 1;
+	tuneEntry.duration = shaveDecimals(tuneEntry.duration * timeFactor, 1);
+	p = tuneEntry.pitches;
 	for (var i = 0; i < tuneEntry.pitches.length; i++) {
-	    tuneEntry.pitches[i][0] *= pitchFactor;
+	    p[i][0] *= pitchFactor;
+	    p[i][0] = shaveDecimals(p[i][0], 1);
 	}
-	return this.tuneEntryToString(tuneEntry);
     },
+
+    setVowel: function(tuneEntry, notes) {
+	// get total duration of notes
+	var totalDuration = 0;
+	for (var i = 0; i < notes.length; i++) {
+	    totalDuration += notes[i][1];
+	}
+	// danger div by zero
+	durationFactor = 100.0 / totalDuration;
+	p = tuneEntry.pitches;
+	orig = [p[0][0], p[p.length-1][0]];
+	changed = [notes[0][0], notes[notes.length-1][0]];
+	// danger div by zero
+	pitchFactors = [changed[0]/orig[0], changed[1]/orig[1]];
+	duration = 0;
+	p = [];
+	for (i = 0; i < notes.length; i++) {
+	    var d = duration * durationFactor
+	    p.push([notes[i][0], shaveDecimals(d, 1)]);
+	    duration += notes[i][1];
+	}
+	tuneEntry.pitches = p;
+	tuneEntry.duration = totalDuration;
+	return pitchFactors;
+    },
+
+    getLongestPitch: function(tuneEntry) {
+	var longest = 0;
+	var pitch = 0;
+	var p = tuneEntry.pitches;
+	for (var i = 0; i < p.length; i++) {
+	    duration = (i == p.length-1 ? tuneEntry.duration : p[i+1][1]) - p[i][1];
+	    if (duration > longest) {
+		longest = duration;
+		pitch = p[i][0];
+	    }
+	}
+	return pitch;
+    },
+
+    parseTune: function(tune) {
+	tune = tune.split("\n");
+	for (var i = 0; i < tune.length; i++) {
+	    tune[i] = this.parseTuneEntry(tune[i]); 
+	}
+	return tune;
+    },
+
+    tuneToString: function(tune) {
+	for (var i = 0; i < tune.length; i++) {
+	    tune[i] = this.tuneEntryToString(tune[i]);
+	}
+	return tune.join("\n");
+    },
+
+    isVowel: function(tuneEntry) {
+	if (!this.isParsedPhoneme(tuneEntry)) return false;
+	return re.vowels.test(tuneEntry.phoneme);
+    },
+    
+    isConsonant: function(tuneEntry) {
+	if (!this.isParsedPhoneme(tuneEntry)) return false;
+	return re.consonants.test(tuneEntry.phoneme);
+    },
+
+    shareNote: function(note, duration) {
+	// duration is total duration of consonants in this note.
+	// adjust note to vowel length,
+	// return factor by which to multiply consonant durations
+	var durationFactor = 1;
+	if (note[1] < duration) { // note too small for consonants?
+	    var vowelShare = note[1] * this.VOWEL_SHARE;
+	    var consonantShare = note[1] - vowelShare;
+	    note[1] = shaveDecimals(vowelShare, 1); // set vowel duration
+	    durationFactor = consonantShare / duration;
+	} else {
+	    note[1] -= duration;
+	}
+	return durationFactor;
+    },
+
+    setSyllable: function(syl, notes) {
+	notes = notes.slice(0); // copies the array
+	var tune = this.parseTune(syl);
+
+	// first pass: find vowel and get consonant durations
+	var durations = [0, 0]; // [before vowel, after vowel]
+	var beforeVowel = true;
+	for (var i = 0; i < tune.length; i++) {
+	    if (this.isVowel(tune[i])) {
+		vowel = tune[i];
+		beforeVowel = false;
+	    }
+	    else if (this.isConsonant(tune[i])) {
+		d = parseFloat(tune[i].duration);
+		durations[beforeVowel?0:1] += d;
+	    }
+	}
+
+	// print("before vowel " + durations[0] + "(" + notes[0][1] + ")");
+	// print("after vowel " + durations[1] + "(" + notes[notes.length-1][1] + ")");
+ 
+	// share first and last notes with consonants (and get time factors)
+	var timeFactors = [1, 1];
+	if (notes.length == 1) {
+	    // share same note with both consonant clusters
+	    var f = this.shareNote(notes[0], durations[0] + durations[1]);
+	    timeFactors = [f, f];
+	} else {
+	    timeFactors = [
+		this.shareNote(notes[0], durations[0]),
+		this.shareNote(notes[notes.length-1], durations[1])
+	    ];
+	}
+	// print("time factors " + timeFactors);
+
+	// set vowel and get pitch factors for consonants
+	pitchFactors = this.setVowel(vowel, notes);
+	// print("pitch factors " + timeFactors);
+
+	 // start with before-vowel factors (will switch at vowel)
+	pitchFactor = pitchFactors[0];
+	timeFactor = timeFactors[0];
+
+	// second pass: set consonants
+	for (var i = 0; i < tune.length; i++) {
+	    if (this.isVowel(tune[i])) {
+		// switch to after-vowel factors
+		pitchFactor = pitchFactors[1];
+		timeFactor = timeFactors[1];
+	    }
+	    else if (this.isConsonant(tune[i])) {
+		this.setConsonant(tune[i], pitchFactor, timeFactor);
+	    }
+	}
+	return this.tuneToString(tune);
+    }
 };
 
-/*
- * Tests
- */
-
-load("assert.js");
-
-test.suite = {
-
-    can_assert: function() {
-	assert(true, "can assert");
-	assertEquals(1, 1, "can assertEquals");
-    },
-
-    can_parse_tune_entry: function() {
-	var line = "m {D 100; P 103.1:0 104.4:50}";
-	var tuneEntry = SetSyllables.parseTuneEntry(line);
-	assertEquals("m", tuneEntry.phoneme, "phoneme should be 'm'");
-	assertEquals(100, tuneEntry.duration, "duration should be 100");
-	assertArraysEqual([103.1, 0], tuneEntry.pitches[0], "pitch 0 should be 103.1:0");
-	assertArraysEqual([104.4, 50], tuneEntry.pitches[1], 
-			  "pitch 1 should be 104.4:50");
-    },
-
-    tune_entry_to_string_reverses_parse: function() {
-	var line = "m {D 100; P 103.1:0 104.4:50}";
-	var tuneEntry = SetSyllables.parseTuneEntry(line);
-	assertEquals(line, SetSyllables.tuneEntryToString(tuneEntry),
-		     "tuneEntryToString should reverse parseTuneEntry");
-    },
-
-    can_set_consonant: function() {
-	var phoneme = "m {D 100; P 103.1:0 104.4:50}";
-	var expected = "m {D 100; P 206.2:0 208.8:50}";
-	var actual = SetSyllables.setConsonant(phoneme, 2.0);
-	assertEquals(expected, actual, "can set consonant to 2x pitch");
-    },
-
-};
-
-
-test();
-
-
+// TODO deal with punctuation duration
+// TODO deal with one syllable, one note (vowel must share on both sides)
 

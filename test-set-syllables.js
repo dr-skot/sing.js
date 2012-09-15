@@ -2,7 +2,7 @@
  * Tests
  */
 
-load("assert.js");
+load("lib/assert.js");
 load("set-syllables.js");
 
 test.suite = {
