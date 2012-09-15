@@ -1,136 +1,11 @@
-// outlets
-outlets = 1;
-var PD_OUTLET = 0;
-
-var set = list;
-function list() {
-  var args = Array.prototype.slice.call(arguments);
-  $abc = args.join(" ");
-  /*
-  $abc = "% Generated more or less automatically by swtoabc by Erich Rickheit KSC\n" +
-  "X:1\n" +
-  "T:Little Sir Hugh\n" +
-  "M:6/8\n" +
-  "L:1/8\n" +
-  "Q:90\n" +
-  "K:G\n" +
-  "z/2-^c/2|d-f dB-A B| GGD D2B/2-c/2|d-e dB-A G| A3- A2 A|d-e dB-A B|\\\n" +
-  " G2 D D2 D|G-A Bc-B A| G3- G2||\n";
-  */
-  var parser = new AbcParse();
-  parser.parse($abc);
-  var tune = parser.getTune();
-  var key = tune.lines[0].staff[0].key;
-  var tempo = tune.metaText.tempo || { bpm:100, duration:[0.25] };
-  var elements = tune.lines[0].staff[0].voices[0];
-  var results = [];
-  var tying = 0;
-  elements.each(function(elem) {
-      //console.log(elem);
-    if (elem.el_type == "note") {
-      var ms = tools.millisecondsForNote(elem, tempo);
-      var freq;
-      var symbol;
-      if (elem.rest) {
-        freq = 0;
-        symbol = '%';
-      } else {
-        freq = tools.frequencyForNote(elem.pitches[0], key);
-        var letter = tools.letterForPitch(elem.pitches[0].pitch);
-        var acc = tools.accidentalForNote(elem.pitches[0], key);
-        var accSymbol = tools.symbolForAcc(acc);
-        symbol = letter + accSymbol;
-        if (elem.pitches[0].startTie) tying = true;
-        if (elem.pitches[0].endTie) tying = false;
-      }
-      results.push(tools.round(freq), tools.round(ms));
-      if (tying) results.push("TIE");
-    }
-  });
-  
-  outputList(PD_OUTLET, results)
-}
-
-outputList.local = 1;
-function outputList(outletNumber, list) {
-  // TODO: find a shortcut for this
-  var listMessage = ["list"];
-  for (var i = 0; i < list.length; i++) {
-    listMessage.push(list[i]);
-  }
-  outlet(outletNumber, listMessage);
-}
-
-
-// miscelaneous useful routines
-var tools = {
-  letterForPitch : function(pitch) {
-    return "CDEFGAB".charAt((pitch + 700) % 7);
-  },
-  symbolForAcc : function(acc) {
-    if (acc == 'dbl_flat') return 'bb';
-    if (acc == 'flat') return 'b';
-    if (acc == 'natural') return '=';
-    if (acc == 'sharp') return '#';
-    if (acc == 'dbl_sharp') return '##';
-    return '';
-  },
-  accidentalForKey : function(pitch, key) {
-    var acc = null;
-    var note = this.letterForPitch(pitch).toLowerCase();
-    key.accidentals.each(function(value) {
-      if (value.note == note) acc = value.acc;
-    });
-    return acc;
-  },
-  accidentalForNote : function(note, key) {
-    var pitch = note.pitch;
-    var acc = note.accidental;
-    if (null == key) acc || null;
-    return (acc && acc != "none") ? acc : this.accidentalForKey(pitch, key); 
-  },
-  // converts name-indexed pitch (C=0 D=1 etc) to halfstep-indexed height (C=0 D=2 E=4 F=5)
-  heightForPitch : function(pitch) {
-    pitch += 700; // get rid of negative numbers
-    var quotient = Math.floor(pitch/7);
-    var remainder = pitch % 7;
-    var strictHeight = [0, 2, 4, 5, 7, 9, 11][remainder];
-    return (quotient * 12 + strictHeight) - 1200;
-    },
-  frequency : function(height, acc) {
-     n = height - 5; // half steps up from A 440
-     if ('dbl_flat' == acc) n -= 2;
-     if ('flat' == acc) n -= 1;
-     if ('sharp' == acc) n += 1;
-     if ('dbl_flat' == acc) n += 2;
-     return Math.pow(2, n/12) * 440;
-    },
-  frequencyForNote : function(note, key) {
-    var height = this.heightForPitch(note.pitch);
-    var acc = this.accidentalForNote(note, key);
-    return this.frequency(height, acc);
-    },
-	millisecondsForNote : function(note, tempo) {
-      var bpm = tempo.bpm;
-      var beatLength = tempo.duration[0]; // why is this an array?
-      var beats = note.duration / beatLength;
-      return 60000 * beats/bpm;
-    },
-  round : function(num) {
-      return Math.floor(num * 1000)/1000;
-    },
-  };
-
-
-
-// make the top-level AbcParser functions private
-AbcParseHeader.local = 1;
-AbcTokenizer.local = 1;
-AbcTune.local = 1;
-AbcParse.local = 1;
-
 /**
- * What follows is third-party code, namely AbcParse and its dependencies
+ * abc2pd.js
+ * Converts music in ABC notation into a series of pitch/duration pairs
+ */
+
+/*
+ * first we paste in two modules: JSON and AbcParser
+ * our code starts on line 5064
  */
 
 /*
@@ -685,7 +560,6 @@ if (!JSON) {
 		}
 		return false;
 	};
-
 
 
 //    abc_parse_header.js: parses a the header fields from a string representing ABC Music Notation into a usable internal structure.
@@ -5186,4 +5060,211 @@ function AbcParse() {
 	};
 }
 
+
+var tools = {
+  letterForPitch : function(pitch) {
+    return "CDEFGAB".charAt((pitch + 700) % 7);
+  },
+  symbolForAcc : function(acc) {
+    if (acc == 'dbl_flat') return 'bb';
+    if (acc == 'flat') return 'b';
+    if (acc == 'natural') return '=';
+    if (acc == 'sharp') return '#';
+    if (acc == 'dbl_sharp') return '##';
+    return '';
+  },
+  accidentalForKey : function(pitch, key) {
+    var acc = null;
+    var note = this.letterForPitch(pitch).toLowerCase();
+    key.accidentals.each(function(value) {
+      if (value.note == note) acc = value.acc;
+    });
+    return acc;
+  },
+  accidentalForNote : function(note, key) {
+    var pitch = note.pitch;
+    var acc = note.accidental;
+    if (null == key) acc || null;
+    return (acc && acc != "none") ? acc : this.accidentalForKey(pitch, key); 
+  },
+  // converts name-indexed pitch (C=0 D=1 etc) to halfstep-indexed height (C=0 D=2 E=4 F=5)
+  heightForPitch : function(pitch) {
+    pitch += 700; // get rid of negative numbers
+    var quotient = Math.floor(pitch/7);
+    var remainder = pitch % 7;
+    var strictHeight = [0, 2, 4, 5, 7, 9, 11][remainder];
+    return (quotient * 12 + strictHeight) - 1200;
+    },
+  frequency : function(height, acc) {
+     n = height - 5; // half steps up from A 440
+     if ('dbl_flat' == acc) n -= 2;
+     if ('flat' == acc) n -= 1;
+     if ('sharp' == acc) n += 1;
+     if ('dbl_flat' == acc) n += 2;
+     return Math.pow(2, n/12) * 440;
+    },
+  frequencyForNote : function(note, key) {
+    var height = this.heightForPitch(note.pitch);
+    var acc = this.accidentalForNote(note, key);
+    return this.frequency(height, acc);
+    },
+	millisecondsForNote : function(note, tempo) {
+      var bpm = tempo.bpm;
+      var beatLength = tempo.duration[0]; // why is this an array?
+      var beats = note.duration / beatLength;
+      return 60000 * beats/bpm;
+    },
+  round : function(num) {
+      return Math.floor(num * 1000)/1000;
+    },
+  isCompound : function(meter) {
+    return (meter && meter.num && meter.num % 3 == 0);
+  },
+  printTune : function(abc) {
+    var parser = new AbcParse();
+    parser.parse(abc);
+    var tune = parser.getTune();
+    print(JSON.stringify(tune));
+  },
+};
+
+ function abc2pd(abc) {
+   var parser = new AbcParse();
+   parser.parse(abc);
+   var tune = parser.getTune();
+   //print(JSON.stringify(tune));
+   var key = tune.lines[0].staff[0].key;
+   var meter = tune.lines[0].staff[0].meter;
+   var tempo = tune.metaText.tempo || { bpm:100, duration:[0.25] };
+   var elements = tune.lines[0].staff[0].voices[0];
+   var results = [];
+   var tying = 0;
+   var slurDepth = 0;
+   var tupletRatio = 1;
+   tune.lines.each(function(line) {
+       meter = line.staff[0].meter || meter;
+       key = line.staff[0].key || key
+         line.staff[0].voices[0].each(function(elem) {
+             //console.log(elem);
+             if (elem.el_type == "key") key = elem;
+             if (elem.el_type == "meter") meter = elem;
+             if (elem.el_type == "note") {
+               var ms = tools.millisecondsForNote(elem, tempo);
+               var freq;
+               var symbol;
+               
+               // adjust length for tuplets
+               if (elem.startTriplet) {
+                 //print('startTriplet: ' + elem.startTriplet);
+                 var n = tools.isCompound(meter) ? 2 : 3;
+                 tupletRatio = [1, 1, 3/2, 2/3, 3/4, n/5, 2/6, n/7, 3/8, n/9][elem.startTriplet];
+                 // (tuplet interpretation according to http://www.lesession.co.uk/abc/abc_notation_part2.htm#ets)
+               }
+               ms *= tupletRatio;
+               if (elem.endTriplet) {
+                 //print('endTriplet');
+                 tupletRatio = 1;
+               }
+               
+               if (elem.rest) {
+                 freq = 0;
+                 symbol = '%';
+               } else {
+                 freq = tools.frequencyForNote(elem.pitches[0], key);
+                 var letter = tools.letterForPitch(elem.pitches[0].pitch);
+                 var acc = tools.accidentalForNote(elem.pitches[0], key);
+                 var accSymbol = tools.symbolForAcc(acc);
+                 symbol = letter + accSymbol;
+                 if (elem.pitches[0].endTie) tying = false;
+                 if (elem.pitches[0].startTie) tying = true;
+                 if (elem.pitches[0].endSlur) slurDepth -= 1;
+                 if (elem.pitches[0].startSlur) slurDepth += 1;
+               }
+               results.push(tools.round(freq), tools.round(ms));
+               if (tying || slurDepth > 0) results.push("TIE");
+             }
+           });
+     });
+   if (results[results.length-1] == "TIE") results.pop();
+   return results.join(" ");
+ }
+
+var abc = arguments[0];
+print(abc2pd(abc));
+
+
+// TODO: move this to a separate file
+// ASSERT
+function AssertException(message) { this.message = message; }
+AssertException.prototype.toString = function () { return 'AssertException: ' + this.message; }
+ function assert(exp, message) { 
+   if (!exp) {
+     print(message);
+     throw new AssertException(message); 
+   }
+ }
+
+// TODO: move tests to a separate file
+function testHeightForPitch() 
+{
+  assert(tools.heightForPitch(-1) == -1);
+  assert(tools.heightForPitch(0) == 0);
+  assert(tools.heightForPitch(1) == 2);
+  assert(tools.heightForPitch(2) == 4);
+  assert(tools.heightForPitch(3) == 5);
+  assert(tools.heightForPitch(4) == 7);
+  assert(tools.heightForPitch(5) == 9);
+  assert(tools.heightForPitch(6) == 11);
+  assert(tools.heightForPitch(7) == 12);
+  assert(tools.heightForPitch(8) == 14);
+  assert(tools.heightForPitch(15) == 26);
+}
+testHeightForPitch();
+
+ function testAbc2pd(abc, pd)
+ {
+   var actual = abc2pd(abc);
+   if (actual != pd) tools.printTune(abc);
+   assert(abc2pd(abc) == pd, "For abc:\n" + abc + "\n  expected " + pd + "\n  got " + abc2pd(abc));
+ }
+
+ // basic
+ var abc = "CGEA";
+ var pd = "329.627 300 493.883 300 415.304 300 554.365 300";
+ testAbc2pd(abc, pd);
+
+ // longer last note
+ var abc = "CGEA2";
+ var pd = "329.627 300 493.883 300 415.304 300 554.365 600";
+ testAbc2pd(abc, pd);
+
+ // '<' notation
+ var abc = "CGE<A";
+ var pd = "329.627 300 493.883 300 415.304 150 554.365 450";
+ testAbc2pd(abc, pd);
+
+ // with a rest
+ var abc = "CGEzA";
+ var pd = "329.627 300 493.883 300 415.304 300 0 300 554.365 300";
+ testAbc2pd(abc, pd);
+
+ // tempo
+ abc = "Q:1/8=1\nCGEA2";
+ pd = "329.627 60000 493.883 60000 415.304 60000 554.365 120000";
+ testAbc2pd(abc, pd);
+
+ // tuplet
+ abc = "(3CGE A";
+ pd = "329.627 200 493.883 200 415.304 200 554.365 300";
+ testAbc2pd(abc, pd);
+
+ // slur (tie notation)
+ abc = "G-C-E A2";
+ pd = "493.883 300 TIE 329.627 300 TIE 415.304 300 554.365 600";
+ testAbc2pd(abc, pd);
+
+ // slur (slur notation)
+ abc = "(GCE)A";
+ pd = "493.883 300 TIE 329.627 300 TIE 415.304 300 554.365 300";
+ testAbc2pd(abc, pd);
 
