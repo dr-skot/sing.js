@@ -17,7 +17,7 @@ shaveDecimals = function(value, numDecimals) {
 }
 
 SetSyllables = {
-    VOWEL_SHARE: 0.25, // consonants will cede this much of a crowded note
+    VOWEL_SHARE: 0.75, // consonants will cede this much of a crowded note
 
     parseTuneEntry: function(tuneEntry) {
 	var result = {};
@@ -57,6 +57,12 @@ SetSyllables = {
 	}
     },
 
+    setFlatConsonant: function(tuneEntry, pitch, timeFactor) {
+	if (typeof(timeFactor) === 'undefined') timeFactor = 1;
+	tuneEntry.duration = shaveDecimals(tuneEntry.duration * timeFactor, 1);
+	tuneEntry.pitches = [[pitch, 0]];
+    },
+
     setVowel: function(tuneEntry, notes) {
 	// get total duration of notes
 	var totalDuration = 0;
@@ -80,6 +86,26 @@ SetSyllables = {
 	tuneEntry.pitches = p;
 	tuneEntry.duration = totalDuration;
 	return pitchFactors;
+    },
+
+    setPhoneme: function(entry, notes) {
+	// get total duration of notes
+	var totalDuration = 0;
+	for (var i = 0; i < notes.length; i++) {
+	    totalDuration += notes[i][1];
+	}
+	// danger div by zero
+	durationFactor = 100.0 / totalDuration;
+	p = tuneEntry.pitches;
+	duration = 0;
+	p = [];
+	for (i = 0; i < notes.length; i++) {
+	    var d = duration * durationFactor
+	    p.push([notes[i][0], shaveDecimals(d, 1)]);
+	    duration += notes[i][1];
+	}
+	tuneEntry.pitches = p;
+	tuneEntry.duration = totalDuration;
     },
 
     getLongestPitch: function(tuneEntry) {
@@ -126,7 +152,8 @@ SetSyllables = {
 	// adjust note to vowel length,
 	// return factor by which to multiply consonant durations
 	var durationFactor = 1;
-	if (note[1] < duration) { // note too small for consonants?
+	// is vowel getting enough of note?
+	if (note[1] - duration < note[1] * this.VOWEL_SHARE) {
 	    var vowelShare = note[1] * this.VOWEL_SHARE;
 	    var consonantShare = note[1] - vowelShare;
 	    note[1] = shaveDecimals(vowelShare, 1); // set vowel duration
@@ -138,7 +165,11 @@ SetSyllables = {
     },
 
     setSyllable: function(syl, notes) {
-	notes = notes.slice(0); // copies the array
+	// make a copy of the notes array
+	notes = notes.slice(0)
+	for (var i = 0; i < notes.length; i++) {
+	    notes[i] = notes[i].slice(0); // copies the array
+	}
 	var tune = this.parseTune(syl);
 
 	// first pass: find vowel and get consonant durations
@@ -179,6 +210,7 @@ SetSyllables = {
 	 // start with before-vowel factors (will switch at vowel)
 	pitchFactor = pitchFactors[0];
 	timeFactor = timeFactors[0];
+	pitch = notes[0][0];
 
 	// second pass: set consonants
 	for (var i = 0; i < tune.length; i++) {
@@ -186,15 +218,24 @@ SetSyllables = {
 		// switch to after-vowel factors
 		pitchFactor = pitchFactors[1];
 		timeFactor = timeFactors[1];
+		pitch = notes[notes.length-1][0];
 	    }
 	    else if (this.isConsonant(tune[i])) {
-		this.setConsonant(tune[i], pitchFactor, timeFactor);
+		//this.setConsonant(tune[i], pitchFactor, timeFactor);
+		this.setFlatConsonant(tune[i], pitch, timeFactor);
 	    }
 	}
 	return this.tuneToString(tune);
-    }
+    },
+    
+    setSyllables: function(syllables, settings) {
+	var result = []
+	for (var i = 0; i < syllables.length; i++) {
+	    result[i] = this.setSyllable(syllables[i], settings[i % settings.length])
+	}
+	return result;
+    },
 };
 
 // TODO deal with punctuation duration
-// TODO deal with one syllable, one note (vowel must share on both sides)
 
