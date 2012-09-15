@@ -135,6 +135,21 @@ function abc2pd(abc) {
     return results.join(" ");
 }
 
+function abc2array(abc) {
+    var tokens = abc2pd(abc).split(" ")
+    var result = []
+    var i = 0
+    var k = -1
+    while (i < tokens.length) {
+	if (tokens[i] == "TIE") i++
+	else k++
+	if (!result[k]) result[k] = []
+	var note = [tokens[i++], tokens[i++]]
+	result[k].push(note)
+    }
+    return result
+}
+
 if (arguments.length > 0) {
     var abc = arguments[0];
     print(abc2pd(abc));
