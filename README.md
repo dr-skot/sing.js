@@ -4,3 +4,8 @@ sing - make the mac voices sing
 * abc2pd.js: converts music in ABC format to a series of pitch/duration pairs
 * syllables.js: splits phonemes in TUNE format into syllables
 * set-syllables.js: sets syllables to notes
+* sing.js does the singing
+
+Here's how you do it:
+
+rhino sing.js GCEA3 my dog has fleas
