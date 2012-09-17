@@ -4,16 +4,31 @@ Makes the Mac OS voices sing. Use it from the command line with [rhino](http://w
 
 ## Command-Line Usage
 
-straight up:
+straight up
 
 ```
 rhino sing.js GCEA3 my dog has fleas
 ```
 
-with options:
+with options
 
 ```
 rhino sing.js -v Bruce -o -1 -t 0.5 GCEA3 my dog has fleas
+```
+
+help
+
+```
+rhino sing.js --help
+Usage: rhino sing.js [opts] [melody] [lyrics...]
+  (melody in abc notation, enclosed in quotes if necessary)
+    -l, --lyrics FILE                Read lyrics from file
+    -m, --melody FILE                Read melody from file
+    -n, --hsteps N                   Shift pitch N half-steps
+    -o, --octaves N                  Shift pitch N octaves
+    -p, --print                      Print phonemes instead of singing
+    -t, --tempo N                    Multiply tempo by N
+    -v, --voice NAME                 Sing with specified voice
 ```
 
 print don't speak
@@ -38,22 +53,6 @@ l {D 46.2; P 554.365:0}
 z {D 104.8; P 554.365:0}
 . {D 10}
 ```
-
-help:
-
-```
-rhino sing.js --help
-Usage: rhino sing.js [opts] [melody] [lyrics...]
-  (melody in abc notation, enclosed in quotes if necessary)
-    -l, --lyrics FILE                Read lyrics from file
-    -m, --melody FILE                Read melody from file
-    -n, --hsteps N                   Shift pitch N half-steps
-    -o, --octaves N                  Shift pitch N octaves
-    -p, --print                      Print phonemes instead of singing
-    -t, --tempo N                    Multiply tempo by N
-    -v, --voice NAME                 Sing with specified voice
-```
-
 
 ## TODO
 
