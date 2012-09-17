@@ -13,7 +13,57 @@ Sing.re = {
     stress: new RegExp(Sing.regex.stress),
 };
 
+shaveDecimals = function(value, numDecimals) {
+    var multiplier = Math.pow(10, numDecimals);
+    return Math.round(multiplier * value) / multiplier;
+}
+
 Sing.Split = {
+
+    parseTuneEntry: function(tuneEntry) {
+	var entry = { duration: 0, pitches: [], raw: tuneEntry }
+	
+	entry.symbol = tuneEntry.split(" ")[0]
+	
+	var matches = tuneEntry.match(/{D ([0-9.-]+)/)
+	if (matches) entry.duration = parseFloat(matches[1])
+	
+	matches = tuneEntry.match(/P ([^}]+)}/)
+	if (matches) {
+	    var pitches = matches[1].split(" ")	
+	    for (var i = 0; i < pitches.length; i++) {
+		pitches[i] = pitches[i].split(":");
+		pitches[i][0] = parseFloat(pitches[i][0])
+		pitches[i][1] = parseFloat(pitches[i][1])
+	    }
+	    entry.pitches = pitches
+	}
+	
+	if (Sing.re.vowels.test(entry.symbol))
+	    entry.type = "vowel"
+	else if (entry.pitches.length > 0)
+	    entry.type = "consonant" // any non-vowel with pitch
+	else if (entry.duration > 0)
+	    entry.type = "pause" // anything with time but no pitch
+	else
+	    entry.type = "meta" // non-vocal data
+	
+	entry.toString = function() {
+	    if (this.type === "meta") return this.raw
+	    var s = this.symbol + " {D " + shaveDecimals(this.duration, 1)
+	    if (this.pitches.length > 0) {
+		s += "; P"
+		for (var i = 0; i < this.pitches.length; i++) {
+		    s += " " + shaveDecimals(this.pitches[i][0], 1) + 
+			":" + shaveDecimals(this.pitches[i][1], 1)
+		}
+	    }
+	    s += "}"
+	    return s
+	}
+
+	return entry
+    },
 
     getBreaks: function(symbols) {
 	var breaks = [];
