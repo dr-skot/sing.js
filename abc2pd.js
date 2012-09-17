@@ -135,7 +135,10 @@ function abc2pd(abc) {
     return results.join(" ");
 }
 
-function abc2array(abc) {
+// returns an array of settings
+// each setting is an array of notes
+// each note is an array like so: [pitch, duration]
+function abc2array(abc, tempoFactor, octaveShift, halfStepShift) {
     var tokens = abc2pd(abc).split(" ")
     var result = []
     var i = 0
@@ -147,8 +150,26 @@ function abc2array(abc) {
 	var note = [tokens[i++], tokens[i++]]
 	result[k].push(note)
     }
+    if (tempoFactor !== undefined) multiplyTempo(result, tempoFactor)
+    if (octaveShift !== undefined) shiftPitch(result, octaveShift, halfStepShift)
     return result
 }
+
+// operates on the array of note-settings returned by abc2array
+function multiplyTempo(music, factor) {
+    music.each(function(setting) { setting.each(function(note) {
+	note[1] *= factor
+    }) })
+}
+
+function shiftPitch(music, octaves, halfSteps) {
+    if (halfSteps !== undefined) octaves += halfSteps/12.0
+    var factor = Math.pow(2, octaves)
+    music.each(function(setting) { setting.each(function(note) {
+	note[0] *= factor
+    }) })
+}
+
 
 if (arguments.length > 0) {
     var abc = arguments[0];

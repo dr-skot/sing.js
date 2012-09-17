@@ -73,10 +73,38 @@ test.suite = {
     },
 
     slur_with_slur_notation_array: function() {
-	abc = "(GCE)A";
-	pd = [[[493.883, 300], [329.627, 300], [415.304, 300]], [[554.365, 300]]];
+	var abc = "(GCE)A";
+	var pd = [[[493.883, 300], [329.627, 300], [415.304, 300]], [[554.365, 300]]];
 	assertArraysEqual(pd, abc2array(abc))
     },
+
+    can_change_tempo: function() {
+	var abc = 'CGEA2'
+	var pd = [ [[329.627, 600]], [[493.883, 600]], [[415.304, 600]], [[554.365, 1200]] ]
+	assertArraysEqual(pd, abc2array(abc, 2))
+    },
+
+    can_change_octave: function() {
+	var pd = [ [[329.627, 300]], [[493.883, 300]], [[415.304, 300]], [[554.365, 600]] ]
+	var expected = [ [[2*329.627, 300]], [[2*493.883, 300]], [[2*415.304, 300]], [[2*554.365, 600]] ]
+	shiftPitch(pd, 1, 0)
+	assertArraysEqual(expected, pd)
+    },
+
+    can_change_half_steps: function() {
+	var pd = [ [[329.627, 300]], [[493.883, 300]], [[415.304, 300]], [[554.365, 600]] ]
+	var expected = [ [[2*329.627, 300]], [[2*493.883, 300]], [[2*415.304, 300]], [[2*554.365, 600]] ]
+	shiftPitch(pd, 0, 12)
+	assertArraysEqual(expected, pd)
+    },
+
+    abc_to_array_can_change_octave: function() {
+	var abc = "CGEA2"
+	var expected = [ [[2*329.627, 300]], [[2*493.883, 300]], [[2*415.304, 300]], [[2*554.365, 600]] ]
+	var actual = abc2array(abc, 1, 1, 0)
+	assertArraysEqual(expected, actual)
+    },
+
 }
 
 test();

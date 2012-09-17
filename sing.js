@@ -45,7 +45,7 @@ function say(x) {
 
 if (args.length > 0) {
     // execute from the command line
-    
+
     // parse options
     opts = { half_steps: 0, octaves: 0, tempo: 1 }
     var checkingOpts = true
@@ -64,13 +64,13 @@ if (args.length > 0) {
 	    args.shift(); opts.print = true
 	}
 	else if (o == '-n' || o == '--hsteps') {
-	    args.shift(); opts.half_steps = args.shift();
+	    args.shift(); opts.half_steps = parseFloat(args.shift());
 	}
 	else if (o == '-o' || o == '--octaves') {
-	    args.shift(); opts.octaves = args.shift();
+	    args.shift(); opts.octaves = parseFloat(args.shift());
 	}
 	else if (o == '-t' || o == '--tempo') {
-	    args.shift(); opts.tempo = args.shift();
+	    args.shift(); opts.tempo = parseFloat(args.shift());
 	}
 	else if (o == '-v' || o == '--voice') {
 	    args.shift(); opts.voice = args.shift();
@@ -91,16 +91,18 @@ if (args.length > 0) {
 	       "",
 	      ].join("\n"))
     } else {
-	var music = args.shift()
-	var lyrics = args.join(" ")
-	
-	var phonemes = getPhonemes(lyrics, opts.voice)
-	var tune = setPhonemes(music, phonemes)
+	var melody = opts.melody ? readFile(opts.melody) : args.shift()
+	var lyrics = opts.lyrics ? readFile(opts.lyrics) : args.join(" ")
+
+	var syllables = splitSyllables(getPhonemes(lyrics, opts.voice))
+	var settings = abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
+	var tune = SetSyllables.setSyllables(syllables, settings)
+
 	if (opts.print) {
 	    print(tune)
 	} else {
-	    if (opts.voice) runCommand('say', tagTune(tune))
-	    else runCommand('say', tagTune(tune), 'using', opts.voice())
+	    if (opts.voice) runCommand('say', '-v', opts.voice, tagTune(tune))
+	    else runCommand('say', tagTune(tune))
 	}
     }
 }
