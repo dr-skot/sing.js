@@ -9,3 +9,9 @@ sing - make the mac voices sing
 Here's how you do it:
 
 rhino sing.js GCEA3 my dog has fleas
+
+Try rhino sing.js --help for more options.
+
+TODO
+
+* include punctuation in tempo computations
