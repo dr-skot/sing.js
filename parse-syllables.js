@@ -13,7 +13,7 @@ Syllables = {
     },
 
     parseSyllables: function(tune) {
-	return this.getSyllables(this.parseTuneEntries(tune))
+	return this.getSyllables(tune)
     },
 
     parseTuneEntries: function(tune) {

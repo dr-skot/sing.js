@@ -3,7 +3,7 @@ args = arguments
 arguments = []
 
 load("abc2pd.js")
-load("syllables.js")
+load("parse-syllables.js")
 load("set-syllables.js")
 
 function getPhonemes(text, voice) {
@@ -95,8 +95,8 @@ if (args.length > 0) {
 	var melody = opts.melody ? readFile(opts.melody) : args.shift()
 	var lyrics = opts.lyrics ? readFile(opts.lyrics) : args.join(" ")
 
-	var syllables = 
-	    Syllables.getSyllables(getPhonemes(lyrics, opts.voice))
+	var phonemes = getPhonemes(lyrics, opts.voice)
+	var syllables = Syllables.parseSyllables(phonemes)
 	var settings = 
 	    ABC.abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
 	Sing.setSyllables(syllables, settings)

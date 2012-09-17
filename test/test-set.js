@@ -3,7 +3,7 @@
  */
 
 load("lib/assert.js");
-load("syllables.js");
+load("parse-syllables.js");
 load("set-syllables.js");
 
 test.suite = {

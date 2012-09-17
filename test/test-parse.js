@@ -1,5 +1,5 @@
 load("lib/assert.js")
-load("syllables.js")
+load("parse-syllables.js")
 
 test.suite = {
     
