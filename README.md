@@ -1,7 +1,6 @@
 # sing.js 
 
-Makes the Mac OS voices sing. Use it from the command line with rhino. 
-Melody in ABC notation.
+Makes the Mac OS voices sing. Use it from the command line with [rhino](http://www.mozilla.org/rhino/). Melody in [ABC notation](http://abcnotation.com).
 
 ## Command-Line Usage
 
@@ -50,7 +49,7 @@ Usage: sing.rb [opts] [melody] [lyrics...]
     -m, --melody FILE                Read melody from file
     -n, --hsteps N                   Shift pitch N half-steps
     -o, --octaves N                  Shift pitch N octaves
-    -p, --print                      Print TUNE command instead of singing
+    -p, --print                      Print phonemes instead of singing
     -t, --tempo N                    Multiply tempo by N
     -v, --voice NAME                 Sing with specified voice
 ```
