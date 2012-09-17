@@ -100,7 +100,7 @@ if (args.length > 0) {
 	    ABC.abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
 	var tune = Sing.Set.setSyllables(syllables, settings)
 
-	<if (opts.print) {
+	if (opts.print) {
 	    print(tune)
 	} else {
 	    if (opts.voice) runCommand('say', '-v', opts.voice, tagTune(tune))

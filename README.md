@@ -13,7 +13,7 @@ rhino sing.js GCEA3 my dog has fleas
 with options
 
 ```
-rhino sing.js -v Bruce -o -1 -t 0.5 GCEA3 my dog has fleas
+rhino sing.js -v Bruce -o -1 -t 0.5 -m melody.txt -l lyrics.txt
 ```
 
 help
@@ -57,3 +57,4 @@ z {D 104.8; P 554.365:0}
 ## TODO
 
 * include punctuation in tempo computations
+* add effects (vibrato, staccato, etc)
