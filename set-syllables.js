@@ -1,6 +1,4 @@
-if (typeof(Sing) === "undefined") Sing = {}
-
-Sing.Set = {
+Sing = {
 
     VOWEL_SHARE: 0.75, // consonants will cede this much of a crowded note
 

@@ -10,8 +10,8 @@ test.suite = {
 
     can_set_non_vowel: function() {
 	var tuneEntry = "m {D 100; P 103.1:0 104.4:50}";
-	tuneEntry = Sing.Split.parseTuneEntry(tuneEntry);
-	Sing.Set.setNonVowel(tuneEntry, 133.33, 0.5);
+	tuneEntry = Syllables.parseTuneEntry(tuneEntry);
+	Sing.setNonVowel(tuneEntry, 133.33, 0.5);
 	actual = tuneEntry.toString()
 	var expected = "m {D 50; P 133.3:0}";
 	assertEquals(expected, actual, "can set nonvowel");
@@ -19,8 +19,8 @@ test.suite = {
 
     can_set_vowel_to_single_note: function() {
 	var tuneEntry = "2AO {D 95; P 97.8:0 98.6:53}";
-	tuneEntry = Sing.Split.parseTuneEntry(tuneEntry);
-	Sing.Set.setVowel(tuneEntry, [[80, 190]]);
+	tuneEntry = Syllables.parseTuneEntry(tuneEntry);
+	Sing.setVowel(tuneEntry, [[80, 190]]);
 	var expected = "2AO {D 190; P 80:0}";
 	var actual = tuneEntry.toString()
 	assertEquals(expected, actual, "can set vowel to single note");
@@ -28,8 +28,8 @@ test.suite = {
 
     can_set_vowel_to_three_notes: function() {
 	var tuneEntry = "2AO {D 95; P 97.8:0 98.6:53}";
-	tuneEntry = Sing.Split.parseTuneEntry(tuneEntry);
-	var pitchFactors = Sing.Set.setVowel(tuneEntry, 
+	tuneEntry = Syllables.parseTuneEntry(tuneEntry);
+	var pitchFactors = Sing.setVowel(tuneEntry, 
 					     [[80, 40], [60, 100], [90, 60]]);
 	var expected = "2AO {D 200; P 80:0 60:20 90:70}";
 	var actual = tuneEntry.toString();
@@ -58,8 +58,8 @@ test.suite = {
 	    "k {D 22.5; P 46.7:0}\n" +
 	    "T {D 38.8; P 46.7:0}\n" +
 	    ". {D 2.5}\n";
-	var syllables = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllable(syllables[0], notes);
+	var syllables = Syllables.getSyllables(syl)
+	Sing.setSyllable(syllables[0], notes);
 	var actual = syllables[0].join("\n")
 	assertEquals(expected, actual, "can set syllable to 3 notes");
     },
@@ -71,8 +71,8 @@ test.suite = {
 	    "1EH {D 135; P 120:0 110:20 94:50}\n" +
 	    "N {D 150; P 80:0}\n";
 	var notes = [[180, 100], [120, 50], [188, 100]];
-	var syllables = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllable(syllables[0], notes)
+	var syllables = Syllables.getSyllables(syl)
+	Sing.setSyllable(syllables[0], notes)
 	var expected = 
 	    "t {D 12.5; P 180:0}\n" +
 	    "r {D 12.5; P 180:0}\n" +
@@ -89,8 +89,8 @@ test.suite = {
 	    "1EH {D 135; P 120:0 110:20 60:50}\n" +
 	    "N {D 150; P 80:0}\n";
 	var notes = [[120, 100]];
-	var syllables = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllable(syllables[0], notes)
+	var syllables = Syllables.getSyllables(syl)
+	Sing.setSyllable(syllables[0], notes)
 	var expected = 
 	    "t {D 6.3; P 120:0}\n" +
 	    "r {D 6.3; P 120:0}\n" +
@@ -107,8 +107,8 @@ test.suite = {
 	    "~ {W \"MY\" Undef !Emphatic !CitFunc}\n" +
 		"m {D 100; P 98.7:0 100.1:50}\n" +
 		"AY {D 175; P 103.7:0 102.8:71 99.7:86}\n"
-	var syllables = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllable(syllables[0], setting)
+	var syllables = Syllables.getSyllables(syl)
+	Sing.setSyllable(syllables[0], setting)
 	assertArraysEqual(origSetting, setting)
     },
 
@@ -128,13 +128,13 @@ test.suite = {
 	    "1AE {D 235; P 145.8:0 148:6 145.9:15 91.3:68 85:87}\n" +
 	    "z {D 170; P 77:0 73:56 73.4:88 75:100}\n"
 
-	var syllables = Sing.Split.getSyllables(syl)
-	var syllables2 = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllables(syllables, settings)
+	var syllables = Syllables.getSyllables(syl)
+	var syllables2 = Syllables.getSyllables(syl)
+	Sing.setSyllables(syllables, settings)
 
-	Sing.Set.setSyllable(syllables2[0], settings[0])
-	Sing.Set.setSyllable(syllables2[1], settings[1])
-	Sing.Set.setSyllable(syllables2[2], settings[2])
+	Sing.setSyllable(syllables2[0], settings[0])
+	Sing.setSyllable(syllables2[1], settings[1])
+	Sing.setSyllable(syllables2[2], settings[2])
  
 	var expected = syllables2.join(" ")
 	var actual = syllables.join(" ")
@@ -153,12 +153,12 @@ test.suite = {
 	    "1AO {D 170; P 111.6:0 119.8:29 142.6:62 145.3:68 143.3:79}\n" +
 	    "g {D 60; P 127.1:0 118.5:42 107.6:83}\n"
 
-	var syllables = Sing.Split.getSyllables(syl)
-	var syllables2 = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllables(syllables, settings)
+	var syllables = Syllables.getSyllables(syl)
+	var syllables2 = Syllables.getSyllables(syl)
+	Sing.setSyllables(syllables, settings)
 
-	Sing.Set.setSyllable(syllables2[0], settings[0])
-	Sing.Set.setSyllable(syllables2[1], settings[1])
+	Sing.setSyllable(syllables2[0], settings[0])
+	Sing.setSyllable(syllables2[1], settings[1])
 
 	var expected = syllables2.join(" ")
 	var actual = syllables.join(" ")
@@ -181,13 +181,13 @@ test.suite = {
 	    "1AE {D 235; P 145.8:0 148:6 145.9:15 91.3:68 85:87}\n" +
 	    "z {D 170; P 77:0 73:56 73.4:88 75:100}\n"
 
-	var syllables = Sing.Split.getSyllables(syl)
-	var syllables2 = Sing.Split.getSyllables(syl)
-	Sing.Set.setSyllables(syllables, settings)
+	var syllables = Syllables.getSyllables(syl)
+	var syllables2 = Syllables.getSyllables(syl)
+	Sing.setSyllables(syllables, settings)
 
-	Sing.Set.setSyllable(syllables2[0], settings[0])
-	Sing.Set.setSyllable(syllables2[1], settings[1])
-	Sing.Set.setSyllable(syllables2[2], settings[0])
+	Sing.setSyllable(syllables2[0], settings[0])
+	Sing.setSyllable(syllables2[1], settings[1])
+	Sing.setSyllable(syllables2[2], settings[0])
 
 	var expected = syllables2.join(" ")
 	var actual = syllables.join(" ")
