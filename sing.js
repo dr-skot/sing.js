@@ -23,8 +23,9 @@ function setWords(abcMusic, lyrics) {
 
 function setPhonemes(abcMusic, phonemes) {
     var settings = ABC.abc2array(abcMusic)
-    var syllables = Sing.Split.splitSyllables(phonemes)
-    return Sing.Set.setSyllables(syllables, settings).join("")
+    var syllables = Sing.Split.getSyllables(phonemes)
+    Sing.Set.setSyllables(syllables, settings)
+    return syllables
 }
 
 function tagTune(tune) {
@@ -95,10 +96,12 @@ if (args.length > 0) {
 	var lyrics = opts.lyrics ? readFile(opts.lyrics) : args.join(" ")
 
 	var syllables = 
-	    Sing.Split.splitSyllables(getPhonemes(lyrics, opts.voice))
+	    Sing.Split.getSyllables(getPhonemes(lyrics, opts.voice))
 	var settings = 
 	    ABC.abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
-	var tune = Sing.Set.setSyllables(syllables, settings)
+	Sing.Set.setSyllables(syllables, settings)
+
+	var tune = syllables.toString()
 
 	if (opts.print) {
 	    print(tune)

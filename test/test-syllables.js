@@ -12,10 +12,10 @@ test.suite = {
 	assert(Sing.re.consonants.test("w"), "can identify consonants");
 	assert(!Sing.re.consonants.test("1UX"), "can identify consonants");
     },
-    can_identify_stress: function() {
-	assert(Sing.re.stress.test("~"), "can identify stress");
-	assert(!Sing.re.stress.test("w"), "can identify stress");
-	assert(!Sing.re.stress.test("1UX"), "can identify stress");
+    can_identify_divider: function() {
+	assert(Sing.re.divider.test("~"), "can identify divider");
+	assert(!Sing.re.divider.test("w"), "can identify divider");
+	assert(!Sing.re.divider.test("1UX"), "can identify divider");
     },
     single_syllable_should_go_unchanged: function() {
 	var tune = "_ {W \"WHAT\" Undef}\n" +
@@ -145,6 +145,38 @@ test.suite = {
 	];
 	assertArraysEqual(expected, actual);
     },
+
+    mark_breaks_should_split_words: function() {
+	var tune = "~ {W \"WHAT\" Undef}\n" +
+	    "w {D 100; P 96.8:0 99.9:50}\n" +
+	    "2UX {D 100; P 108.4:0}\n" +
+	    "t {D 40; P 105:0 107.4:50}\n" +
+	    "~ {W \"THE\" Undef  CitFunc }\n" +
+	    "D {D 115; P 113.6:0 114.6:26 125.1:48 143.9:78 148.2:91}\n" +
+	    "1IY {D 260; P 148.7:0 94:48 77.2:88 75:100}\n" +
+	    ". {D 10}\n";
+	var entries = Sing.Split.parseTuneEntries(tune);
+	Sing.Split.markBreaks(entries)
+	assertTrue(entries[4].sylBreak)
+	for (var i = 0; i < entries.length; i++) {
+	    if (i != 4) assertFalse(entries[i].sylBreak)
+	}
+    },
+
+    get_syllables_should_split_words: function() {
+	var tune = "~ {W \"WHAT\" Undef}\n" +
+	    "w {D 100; P 96.8:0 99.9:50}\n" +
+	    "2UX {D 100; P 108.4:0}\n" +
+	    "t {D 40; P 105:0 107.4:50}\n" +
+	    "~ {W \"THE\" Undef  CitFunc }\n" +
+	    "D {D 115; P 113.6:0 114.6:26 125.1:48 143.9:78 148.2:91}\n" +
+	    "1IY {D 260; P 148.7:0 94:48 77.2:88 75:100}\n" +
+	    ". {D 10}\n";
+	var syllables = Sing.Split.getSyllables(tune);
+	assertEquals(2, syllables.length)
+	assertEquals("~", syllables[1][0].symbol)
+    },
+
 }
 
 test();
