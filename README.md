@@ -1,18 +1,61 @@
-sing - make the mac voices sing
+# sing.js 
 
-* phonemes: converts text to phonemes in TUNE format
-* abc2pd.js: converts music in ABC format to a series of pitch/duration pairs
-* syllables.js: splits phonemes in TUNE format into syllables
-* set-syllables.js: sets syllables to notes
-* sing.js does the singing
+Makes the Mac OS voices sing. Use it from the command line with rhino. 
+Melody in ABC notation.
 
-Here's how you do it:
+## Command-Line Usage
 
+straight up:
+
+```
 rhino sing.js GCEA3 my dog has fleas
+```
 
-Try rhino sing.js --help for more options.
+with options:
 
-TODO
+```
+rhino sing.js -v Bruce -o -1 -t 0.5 GCEA3 my dog has fleas
+```
+
+print don't speak
+
+```
+rhino sing.js -p GCEA3 my dog has fleas
+~ {W "MY" Undef !Emphatic !CitFunc}
+m {D 75; P 493.883:0}
+AY {D 225; P 493.883:0}
+,_ {W "DOG" Noun}
+d {D 36.1; P 329.627:0}
+1AO {D 225; P 329.627:0}
+g {D 38.9; P 329.627:0}
+,~ {W "HAS" Undef !Emphatic !CitFunc}
+h {D 35; P 415.304:0}
+AE {D 225; P 415.304:0}
+z {D 40; P 415.304:0}
+,_ {W "FLEAS" Noun}
+f {D 74; P 554.365:0}
+l {D 46.2; P 554.365:0}
+1IY {D 675; P 554.365:0}
+z {D 104.8; P 554.365:0}
+. {D 10}
+```
+
+help:
+
+```
+rhino sing.js --help
+Usage: sing.rb [opts] [melody] [lyrics...]
+  (melody in abc notation, enclosed in quotes if necessary)
+    -l, --lyrics FILE                Read lyrics from file
+    -m, --melody FILE                Read melody from file
+    -n, --hsteps N                   Shift pitch N half-steps
+    -o, --octaves N                  Shift pitch N octaves
+    -p, --print                      Print TUNE command instead of singing
+    -t, --tempo N                    Multiply tempo by N
+    -v, --voice NAME                 Sing with specified voice
+```
+
+
+## TODO
 
 * include punctuation in tempo computations
-* make namespace policy more consistent
