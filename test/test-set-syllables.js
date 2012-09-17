@@ -14,7 +14,7 @@ test.suite = {
 
     can_parse_tune_entry: function() {
 	var line = "m {D 100; P 103.1:0 104.4:50}";
-	var tuneEntry = SetSyllables.parseTuneEntry(line);
+	var tuneEntry = Sing.Set.parseTuneEntry(line);
 	assertEquals("m", tuneEntry.phoneme, "phoneme should be 'm'");
 	assertEquals(100, tuneEntry.duration, "duration should be 100");
 	assertArraysEqual([103.1, 0], tuneEntry.pitches[0], 
@@ -25,45 +25,45 @@ test.suite = {
 
     should_only_parse_vowels_and_consonants: function() {
 	var line = "_ {W \"STRENGTH\" Noun !Name}";
-	var actual = SetSyllables.parseTuneEntry(line);
+	var actual = Sing.Set.parseTuneEntry(line);
 	assertEquals(line, actual, "should only parse vowels and consonants");
     },
 
     tune_entry_to_string_reverses_parse: function() {
 	var line = "m {D 100; P 103.1:0 104.4:50}";
-	var tuneEntry = SetSyllables.parseTuneEntry(line);
-	var actual = SetSyllables.tuneEntryToString(tuneEntry);
+	var tuneEntry = Sing.Set.parseTuneEntry(line);
+	var actual = Sing.Set.tuneEntryToString(tuneEntry);
 	assertEquals(line, actual, "tuneEntryToString should reverse parse");
     },
 
     tune_entry_to_string_on_string_is_string: function() {
 	var line = "_ {W \"STRENGTH\" Noun !Name}";
-	var actual = SetSyllables.tuneEntryToString(line);
+	var actual = Sing.Set.tuneEntryToString(line);
 	assertEquals(line, actual, "tuneEntryToString on string should be string");
     },
 
     can_set_consonant: function() {
 	var tuneEntry = "m {D 100; P 103.1:0 104.4:50}";
-	tuneEntry = SetSyllables.parseTuneEntry(tuneEntry);
-	SetSyllables.setConsonant(tuneEntry, 2.0);
-	actual = SetSyllables.tuneEntryToString(tuneEntry);
+	tuneEntry = Sing.Set.parseTuneEntry(tuneEntry);
+	Sing.Set.setConsonant(tuneEntry, 2.0);
+	actual = Sing.Set.tuneEntryToString(tuneEntry);
 	var expected = "m {D 100; P 206.2:0 208.8:50}";
 	assertEquals(expected, actual, "can set consonant to 2x pitch");
     },
 
     can_get_longest_pitch: function() {
 	var tuneEntry = "2AO {D 95; P 97.8:0 98.6:53}";
-	tuneEntry = SetSyllables.parseTuneEntry(tuneEntry);
-	assertEquals(97.8, SetSyllables.getLongestPitch(tuneEntry),
+	tuneEntry = Sing.Set.parseTuneEntry(tuneEntry);
+	assertEquals(97.8, Sing.Set.getLongestPitch(tuneEntry),
 		    "longest pitch should be 97.8");
     },
 
     can_set_vowel_to_single_note: function() {
 	var tuneEntry = "2AO {D 95; P 97.8:0 98.6:53}";
-	tuneEntry = SetSyllables.parseTuneEntry(tuneEntry);
-	var pitchFactors = SetSyllables.setVowel(tuneEntry, [[80, 190]]);
+	tuneEntry = Sing.Set.parseTuneEntry(tuneEntry);
+	var pitchFactors = Sing.Set.setVowel(tuneEntry, [[80, 190]]);
 	var expected = "2AO {D 190; P 80:0}";
-	var actual = SetSyllables.tuneEntryToString(tuneEntry);
+	var actual = Sing.Set.tuneEntryToString(tuneEntry);
 	assertEquals(expected, actual, "can set vowel to single note");
 	assertIsClose(80/97.8, pitchFactors[0], 0.01, "in factor should be 80/97.8");
 	assertIsClose(80/98.6, pitchFactors[1], 0.01, "out factor should be 80/98.6");
@@ -71,11 +71,11 @@ test.suite = {
 
     can_set_vowel_to_three_notes: function() {
 	var tuneEntry = "2AO {D 95; P 97.8:0 98.6:53}";
-	tuneEntry = SetSyllables.parseTuneEntry(tuneEntry);
-	var pitchFactors = SetSyllables.setVowel(tuneEntry, 
+	tuneEntry = Sing.Set.parseTuneEntry(tuneEntry);
+	var pitchFactors = Sing.Set.setVowel(tuneEntry, 
 						 [[80, 40], [60, 100], [90, 60]]);
 	var expected = "2AO {D 200; P 80:0 60:20 90:70}";
-	var actual = SetSyllables.tuneEntryToString(tuneEntry);
+	var actual = Sing.Set.tuneEntryToString(tuneEntry);
 	assertEquals(expected, actual, "can set vowel to three notes");
 	assertIsClose(80/97.8, pitchFactors[0], 0.01, "in factor should be 80/97.8");
 	assertIsClose(90/98.6, pitchFactors[1], 0.01, "out factor should be 90/98.6");
@@ -89,8 +89,8 @@ test.suite = {
 	    ". {D 10}"
 	];
 	for (var i = 0; i < entries.length; i++) {
-	    var entry = SetSyllables.parseTuneEntry(entries[i]);
-	    actual = SetSyllables.isVowel(entry);
+	    var entry = Sing.Set.parseTuneEntry(entries[i]);
+	    actual = Sing.Set.isVowel(entry);
 	    if (entries[i] == "1EH {D 135; P 129.1:0 112.2:22 93.4:52}") {
 		assertTrue(actual, "can identify vowel");
 	    } else {
@@ -107,8 +107,8 @@ test.suite = {
 	    ". {D 10}"
 	];
 	for (var i = 0; i < entries.length; i++) {
-	    var entry = SetSyllables.parseTuneEntry(entries[i]);
-	    actual = SetSyllables.isConsonant(entry);
+	    var entry = Sing.Set.parseTuneEntry(entries[i]);
+	    actual = Sing.Set.isConsonant(entry);
 	    if (entries[i] == "s {D 125; P 93.3:0 96.6:32 113.7:76}") {
 		assertTrue(actual, "should be consonant " + entries[i]);
 	    } else {
@@ -146,7 +146,7 @@ test.suite = {
 	    "k {D 90; P 37.1:0 38.1:33}\n" +
 	    "T {D 155; P 43:0 41.4:19 41.9:39 45:68 50.1:100}\n" +
 	    ". {D 10}\n";
-	var actual = SetSyllables.setSyllable(syl, notes);
+	var actual = Sing.Set.setSyllable(syl, notes);
 	//var actual = expected;
 	assertEquals(expected, actual, "can set syllable to 3 notes");
     },
@@ -164,7 +164,7 @@ test.suite = {
 	    "1EH {D 135; P 120:0 110:20 94:50}\n" +
 	    "N {D 150; P 80:0}\n";
 	var notes = [[180, 100], [120, 50], [188, 100]];
-	var actual = SetSyllables.setSyllable(syl, notes);
+	var actual = Sing.Set.setSyllable(syl, notes);
 	var expected = 
 	    "t {D 12.5; P 180:0}\n" +
 	    "r {D 12.5; P 180:0}\n" +
@@ -185,7 +185,7 @@ test.suite = {
 	    "1EH {D 135; P 120:0 110:20 60:50}\n" +
 	    "N {D 150; P 80:0}\n";
 	var notes = [[120, 100]];
-	var actual = SetSyllables.setSyllable(syl, notes);
+	var actual = Sing.Set.setSyllable(syl, notes);
 	var expected = 
 	    "t {D 6.3; P 120:0}\n" +
 	    "r {D 6.3; P 120:0}\n" +
@@ -206,7 +206,7 @@ test.suite = {
 	    "~ {W \"MY\" Undef !Emphatic !CitFunc}\n" +
 		"m {D 100; P 98.7:0 100.1:50}\n" +
 		"AY {D 175; P 103.7:0 102.8:71 99.7:86}\n"
-	SetSyllables.setSyllable(syl, setting)
+	Sing.Set.setSyllable(syl, setting)
 	assertArraysEqual(origSetting, setting)
     },
 
@@ -227,11 +227,11 @@ test.suite = {
 		"z {D 170; P 77:0 73:56 73.4:88 75:100}\n"
 	]
 
-	var tune = SetSyllables.setSyllables(syl, settings)
+	var tune = Sing.Set.setSyllables(syl, settings)
 	var expected = [
-	    SetSyllables.setSyllable(syl[0], settings[0]),
-	    SetSyllables.setSyllable(syl[1], settings[1]),
-	    SetSyllables.setSyllable(syl[2], settings[2]),
+	    Sing.Set.setSyllable(syl[0], settings[0]),
+	    Sing.Set.setSyllable(syl[1], settings[1]),
+	    Sing.Set.setSyllable(syl[2], settings[2]),
 	]
 	assertArraysEqual(expected, tune, "can set 3 syllables to 3 notes")
     },
@@ -249,10 +249,10 @@ test.suite = {
 		"g {D 60; P 127.1:0 118.5:42 107.6:83}\n",
 	]
 
-	var tune = SetSyllables.setSyllables(syl, settings)
+	var tune = Sing.Set.setSyllables(syl, settings)
 	var expected = [
-	    SetSyllables.setSyllable(syl[0], settings[0]),
-	    SetSyllables.setSyllable(syl[1], settings[1]),
+	    Sing.Set.setSyllable(syl[0], settings[0]),
+	    Sing.Set.setSyllable(syl[1], settings[1]),
 	]
 	assertArraysEqual(expected, tune, "can set 2 syllables to 3 notes")
     },
@@ -274,11 +274,11 @@ test.suite = {
 		"z {D 170; P 77:0 73:56 73.4:88 75:100}\n"
 	]
 
-	var tune = SetSyllables.setSyllables(syl, settings)
+	var tune = Sing.Set.setSyllables(syl, settings)
 	var expected = [
-	    SetSyllables.setSyllable(syl[0], settings[0]),
-	    SetSyllables.setSyllable(syl[1], settings[1]),
-	    SetSyllables.setSyllable(syl[2], settings[0]),
+	    Sing.Set.setSyllable(syl[0], settings[0]),
+	    Sing.Set.setSyllable(syl[1], settings[1]),
+	    Sing.Set.setSyllable(syl[2], settings[0]),
 	]
 	assertArraysEqual(expected, tune, "can set 2 syllables to 3 notes")
     },

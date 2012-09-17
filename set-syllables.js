@@ -1,14 +1,16 @@
-regex = {
+if (typeof(Sing) === "undefined") Sing = {}
+
+Sing.regex = {
   vowels: 'AE|EY|AO|AX|IY|EH|IH|AY|IX|AA|UW|UH|UX|OW|AW|OY',
   consonants: 'b|C|d|D|f|g|h|J|k|l|m|n|N|p|r|s|S|t|T|v|w|y|z|Z',
   punctuation: '\\.|!|\\?|,|:',
   stress: '~|_|\\+|=',
 };
 
-re = {
-    vowels: new RegExp(regex.vowels),
-    consonants: new RegExp(regex.consonants),
-    stress: new RegExp(regex.stress),
+Sing.re = {
+    vowels: new RegExp(Sing.regex.vowels),
+    consonants: new RegExp(Sing.regex.consonants),
+    stress: new RegExp(Sing.regex.stress),
 };
 
 shaveDecimals = function(value, numDecimals) {
@@ -16,7 +18,8 @@ shaveDecimals = function(value, numDecimals) {
     return Math.round(multiplier * value) / multiplier;
 }
 
-SetSyllables = {
+Sing.Set = {
+
     VOWEL_SHARE: 0.75, // consonants will cede this much of a crowded note
 
     parseTuneEntry: function(tuneEntry) {
@@ -139,12 +142,12 @@ SetSyllables = {
 
     isVowel: function(tuneEntry) {
 	if (!this.isParsedPhoneme(tuneEntry)) return false;
-	return re.vowels.test(tuneEntry.phoneme);
+	return Sing.re.vowels.test(tuneEntry.phoneme);
     },
     
     isConsonant: function(tuneEntry) {
 	if (!this.isParsedPhoneme(tuneEntry)) return false;
-	return re.consonants.test(tuneEntry.phoneme);
+	return Sing.re.consonants.test(tuneEntry.phoneme);
     },
 
     shareNote: function(note, duration) {

@@ -3,19 +3,19 @@ load("syllables.js");
 
 test.suite = {
     can_identify_vowels: function() {
-	assertTrue(!re.vowels.test("~"), "can identify vowels");
-	assertTrue(!re.vowels.test("w"), "can identify vowels");
-	assertTrue(re.vowels.test("1UX"), "can identify vowels");
+	assertTrue(!Sing.re.vowels.test("~"), "can identify vowels");
+	assertTrue(!Sing.re.vowels.test("w"), "can identify vowels");
+	assertTrue(Sing.re.vowels.test("1UX"), "can identify vowels");
     },
     can_identify_consonants: function() {
-	assert(!re.consonants.test("~"), "can identify consonants");
-	assert(re.consonants.test("w"), "can identify consonants");
-	assert(!re.consonants.test("1UX"), "can identify consonants");
+	assert(!Sing.re.consonants.test("~"), "can identify consonants");
+	assert(Sing.re.consonants.test("w"), "can identify consonants");
+	assert(!Sing.re.consonants.test("1UX"), "can identify consonants");
     },
     can_identify_stress: function() {
-	assert(re.stress.test("~"), "can identify stress");
-	assert(!re.stress.test("w"), "can identify stress");
-	assert(!re.stress.test("1UX"), "can identify stress");
+	assert(Sing.re.stress.test("~"), "can identify stress");
+	assert(!Sing.re.stress.test("w"), "can identify stress");
+	assert(!Sing.re.stress.test("1UX"), "can identify stress");
     },
     single_syllable_should_go_unchanged: function() {
 	var tune = "_ {W \"WHAT\" Undef}\n" +
@@ -23,7 +23,7 @@ test.suite = {
 	    "1UX {D 165; P 148.5:0 92.9:73 76.1:91}\n" +
 	    "t {D 150; P 72.3:0 74.4:17 81.4:47 99.9:100}\n" +
 	    ". {D 10}\n";
-	var actual = splitSyllables(tune);
+	var actual = Sing.Split.splitSyllables(tune);
 	var expected = [tune];
 	assertArraysEqual(expected, actual);
     },
@@ -36,7 +36,7 @@ test.suite = {
 	    "D {D 115; P 113.6:0 114.6:26 125.1:48 143.9:78 148.2:91}\n" +
 	    "1IY {D 260; P 148.7:0 94:48 77.2:88 75:100}\n" +
 	    ". {D 10}\n";
-	var actual = splitSyllables(tune);
+	var actual = Sing.Split.splitSyllables(tune);
 	var expected = [
 	    "~ {W \"WHAT\" Undef}\n" +
 		"w {D 100; P 96.8:0 99.9:50}\n" +
@@ -56,7 +56,7 @@ test.suite = {
 	    "IH {D 110; P 94.8:0 90.9:14 87.3:64}\n" +
 	    "N {D 170; P 81.7:0 76.2:59 76.1:100}\n" +
 	    ". {D 10}\n";
-	var actual = splitSyllables(tune);
+	var actual = Sing.Split.splitSyllables(tune);
 	var expected = [
 	    "_ {W \"GOING\" Undef !Name}\n" +
 		"g {D 95; P 96.3:0 102.9:37 111.5:68 116:79}\n" +
@@ -78,7 +78,7 @@ test.suite = {
 	    "IY {D 135; P 85.1:0 78:70}\n" +
 	    "t {D 125; P 72.6:0 74.3:16 81.6:48 99.6:100}\n" +
 	    ". {D 10}\n";
-	var actual = splitSyllables(tune);
+	var actual = Sing.Split.splitSyllables(tune);
 	var expected = [
 	    "_ {W \"BACKSTREET\" Noun Name}\n" +
 		"b {D 100; P 93.6:0 94.6:20 98.7:40 106.9:70}\n" +
@@ -104,7 +104,7 @@ test.suite = {
 	    "IY {D 135; P 85.1:0 78:70}\n" +
 	    "t {D 125; P 72.6:0 74.3:16 81.6:48 99.6:100}\n" +
 	    ". {D 10}\n";
-	var actual = splitSyllables(tune);
+	var actual = Sing.Split.splitSyllables(tune);
 	var expected = [
 	    "_ {W \"BACKSTREET\" Noun Name}\n" +
 		"b {D 100; P 93.6:0 94.6:20 98.7:40 106.9:70}\n" +
@@ -130,7 +130,7 @@ test.suite = {
 	    "t {D 55; P 141.6:0 147.8:18 150.5:55}\n" +
 	    "=IH {D 55; P 159.9:0 163.4:18}\n" +
 	    "N {D 70; P 145.4:0 141.5:14}\n";
-	var actual = splitSyllables(tune);
+	var actual = Sing.Split.splitSyllables(tune);
 	var expected = [
 	    "_ {W \"PERFECTING\" Undef}\n" +
 		"p {D 75; P 141.5:0 142.4:53}\n" +

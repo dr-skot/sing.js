@@ -15,3 +15,4 @@ Try rhino sing.js --help for more options.
 TODO
 
 * include punctuation in tempo computations
+* make namespace policy more consistent

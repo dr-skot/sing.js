@@ -2,10 +2,11 @@
  * abc2pd.js
  * Converts music in ABC notation into a series of pitch/duration pairs
  */
-
 load("lib/abc_parse.js");
 
-var tools = {
+if (typeof(ABC) === "undefined") ABC = {}
+
+ABC.tools = {
     letterForPitch : function(pitch) {
 	return "CDEFGAB".charAt((pitch + 700) % 7);
     },
@@ -72,7 +73,7 @@ var tools = {
     },
 };
 
-function abc2pd(abc) {
+ABC.abc2pd = function(abc) {
     var parser = new AbcParse();
     parser.parse(abc);
     var tune = parser.getTune();
@@ -93,14 +94,14 @@ function abc2pd(abc) {
             if (elem.el_type == "key") key = elem;
             if (elem.el_type == "meter") meter = elem;
             if (elem.el_type == "note") {
-		var ms = tools.millisecondsForNote(elem, tempo);
+		var ms = ABC.tools.millisecondsForNote(elem, tempo);
 		var freq;
 		var symbol;
 		
 		// adjust length for tuplets
 		if (elem.startTriplet) {
                     //print('startTriplet: ' + elem.startTriplet);
-                    var n = tools.isCompound(meter) ? 2 : 3;
+                    var n = ABC.tools.isCompound(meter) ? 2 : 3;
 		    tupletRatios = [1, 1, 3/2, 2/3, 3/4, n/5, 2/6, n/7, 3/8, n/9];
                     tupletRatio = tupletRatios[elem.startTriplet];
                     // (tuplet interpretation according to 
@@ -116,17 +117,17 @@ function abc2pd(abc) {
                     freq = 0;
                     symbol = '%';
 		} else {
-                    freq = tools.frequencyForNote(elem.pitches[0], key);
-                    var letter = tools.letterForPitch(elem.pitches[0].pitch);
-                    var acc = tools.accidentalForNote(elem.pitches[0], key);
-                    var accSymbol = tools.symbolForAcc(acc);
+                    freq = ABC.tools.frequencyForNote(elem.pitches[0], key);
+                    var letter = ABC.tools.letterForPitch(elem.pitches[0].pitch);
+                    var acc = ABC.tools.accidentalForNote(elem.pitches[0], key);
+                    var accSymbol = ABC.tools.symbolForAcc(acc);
                     symbol = letter + accSymbol;
                     if (elem.pitches[0].endTie) tying = false;
                     if (elem.pitches[0].startTie) tying = true;
                     if (elem.pitches[0].endSlur) slurDepth -= 1;
                     if (elem.pitches[0].startSlur) slurDepth += 1;
 		}
-		results.push(tools.round(freq), tools.round(ms));
+		results.push(ABC.tools.round(freq), ABC.tools.round(ms));
 		if (tying || slurDepth > 0) results.push("TIE");
             }
         });
@@ -138,8 +139,8 @@ function abc2pd(abc) {
 // returns an array of settings
 // each setting is an array of notes
 // each note is an array like so: [pitch, duration]
-function abc2array(abc, tempoFactor, octaveShift, halfStepShift) {
-    var tokens = abc2pd(abc).split(" ")
+ABC.abc2array = function(abc, tempoFactor, octaveShift, halfStepShift) {
+    var tokens = this.abc2pd(abc).split(" ")
     var result = []
     var i = 0
     var k = -1
@@ -150,19 +151,19 @@ function abc2array(abc, tempoFactor, octaveShift, halfStepShift) {
 	var note = [tokens[i++], tokens[i++]]
 	result[k].push(note)
     }
-    if (tempoFactor !== undefined) multiplyTempo(result, tempoFactor)
-    if (octaveShift !== undefined) shiftPitch(result, octaveShift, halfStepShift)
+    if (tempoFactor !== undefined) this.multiplyTempo(result, tempoFactor)
+    if (octaveShift !== undefined) this.shiftPitch(result, octaveShift, halfStepShift)
     return result
 }
 
 // operates on the array of note-settings returned by abc2array
-function multiplyTempo(music, factor) {
+ABC.multiplyTempo = function(music, factor) {
     music.each(function(setting) { setting.each(function(note) {
 	note[1] *= factor
     }) })
 }
 
-function shiftPitch(music, octaves, halfSteps) {
+ABC.shiftPitch = function(music, octaves, halfSteps) {
     if (halfSteps !== undefined) octaves += halfSteps/12.0
     var factor = Math.pow(2, octaves)
     music.each(function(setting) { setting.each(function(note) {
@@ -173,6 +174,6 @@ function shiftPitch(music, octaves, halfSteps) {
 
 if (arguments.length > 0) {
     var abc = arguments[0];
-    print(abc2pd(abc));
+    print(ABC.abc2pd(abc));
 }
 

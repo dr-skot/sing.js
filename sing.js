@@ -22,9 +22,9 @@ function setWords(abcMusic, lyrics) {
 }
 
 function setPhonemes(abcMusic, phonemes) {
-    var settings = abc2array(abcMusic)
-    var syllables = splitSyllables(phonemes)
-    return SetSyllables.setSyllables(syllables, settings).join("")
+    var settings = ABC.abc2array(abcMusic)
+    var syllables = Sing.Split.splitSyllables(phonemes)
+    return Sing.Set.setSyllables(syllables, settings).join("")
 }
 
 function tagTune(tune) {
@@ -94,9 +94,11 @@ if (args.length > 0) {
 	var melody = opts.melody ? readFile(opts.melody) : args.shift()
 	var lyrics = opts.lyrics ? readFile(opts.lyrics) : args.join(" ")
 
-	var syllables = splitSyllables(getPhonemes(lyrics, opts.voice))
-	var settings = abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
-	var tune = SetSyllables.setSyllables(syllables, settings)
+	var syllables = 
+	    Sing.Split.splitSyllables(getPhonemes(lyrics, opts.voice))
+	var settings = 
+	    ABC.abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
+	var tune = Sing.Set.setSyllables(syllables, settings)
 
 	if (opts.print) {
 	    print(tune)
