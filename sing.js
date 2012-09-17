@@ -79,13 +79,13 @@ if (args.length > 0) {
     }
     
     if (opts.help) {
-	print(["Usage: sing.rb [opts] [melody] [lyrics...]",
+	print(["Usage: rhino sing.js [opts] [melody] [lyrics...]",
 	       "  (melody in abc notation, enclosed in quotes if necessary)",
 	       "    -l, --lyrics FILE                Read lyrics from file",
 	       "    -m, --melody FILE                Read melody from file",
 	       "    -n, --hsteps N                   Shift pitch N half-steps",
 	       "    -o, --octaves N                  Shift pitch N octaves",
-	       "    -p, --print                      Print TUNE command instead of singing",
+	       "    -p, --print                      Print phonemes instead of singing",
 	       "    -t, --tempo N                    Multiply tempo by N",
 	       "    -v, --voice NAME                 Sing with specified voice",
 	       "",
@@ -100,7 +100,7 @@ if (args.length > 0) {
 	    ABC.abc2array(melody, opts.tempo, opts.octaves, opts.half_steps)
 	var tune = Sing.Set.setSyllables(syllables, settings)
 
-	if (opts.print) {
+	<if (opts.print) {
 	    print(tune)
 	} else {
 	    if (opts.voice) runCommand('say', '-v', opts.voice, tagTune(tune))

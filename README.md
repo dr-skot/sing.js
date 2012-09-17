@@ -43,7 +43,7 @@ help:
 
 ```
 rhino sing.js --help
-Usage: sing.rb [opts] [melody] [lyrics...]
+Usage: rhino sing.js [opts] [melody] [lyrics...]
   (melody in abc notation, enclosed in quotes if necessary)
     -l, --lyrics FILE                Read lyrics from file
     -m, --melody FILE                Read melody from file
