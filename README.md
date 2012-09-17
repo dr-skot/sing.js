@@ -36,25 +36,30 @@ print don't speak
 ```
 rhino sing.js -p GCEA3 my dog has fleas
 ~ {W "MY" Undef !Emphatic !CitFunc}
-m {D 75; P 493.883:0}
-AY {D 225; P 493.883:0}
-,_ {W "DOG" Noun}
-d {D 36.1; P 329.627:0}
-1AO {D 225; P 329.627:0}
-g {D 38.9; P 329.627:0}
-,~ {W "HAS" Undef !Emphatic !CitFunc}
-h {D 35; P 415.304:0}
-AE {D 225; P 415.304:0}
-z {D 40; P 415.304:0}
-,_ {W "FLEAS" Noun}
-f {D 74; P 554.365:0}
-l {D 46.2; P 554.365:0}
-1IY {D 675; P 554.365:0}
-z {D 104.8; P 554.365:0}
-. {D 10}
+m {D 75; P 493.9:0}
+AY {D 225; P 493.9:0}
+_ {W "DOG" Noun}
+d {D 36.1; P 329.6:0}
+1AO {D 225; P 329.6:0}
+g {D 38.9; P 329.6:0}
+~ {W "HAS" Undef !Emphatic !CitFunc}
+h {D 35; P 415.3:0}
+AE {D 225; P 415.3:0}
+z {D 40; P 415.3:0}
+_ {W "FLEAS" Noun}
+f {D 72; P 554.4:0}
+l {D 45; P 554.4:0}
+1IY {D 675; P 554.4:0}
+z {D 102; P 554.4:0}
+. {D 6}
 ```
+
+## Thanks
+
+This is written in JavaScript because it uses the excellent [abcjs](http://code.google.com/p/abcjs/) library. Thanks to the authors of it, Gregory Dyke and Paul Rosen.
+
+Thanks also to Greg Beller who showed me how to get detailed phoneme data from the speech synthesizer.
 
 ## TODO
 
-* include punctuation in tempo computations
 * add effects (vibrato, staccato, etc)
