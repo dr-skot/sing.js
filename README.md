@@ -36,21 +36,21 @@ print don't speak
 ```
 rhino sing.js -p GCEA3 my dog has fleas
 ~ {W "MY" Undef !Emphatic !CitFunc}
-m {D 75; P 493.9:0}
-AY {D 225; P 493.9:0}
+m {D 75; P 392:0}
+AY {D 225; P 392:0}
 _ {W "DOG" Noun}
-d {D 36.1; P 329.6:0}
-1AO {D 225; P 329.6:0}
-g {D 38.9; P 329.6:0}
+d {D 36.1; P 261.6:0}
+1AO {D 225; P 261.6:0}
+g {D 38.9; P 261.6:0}
 ~ {W "HAS" Undef !Emphatic !CitFunc}
-h {D 35; P 415.3:0}
-AE {D 225; P 415.3:0}
-z {D 40; P 415.3:0}
+h {D 35; P 329.6:0}
+AE {D 225; P 329.6:0}
+z {D 40; P 329.6:0}
 _ {W "FLEAS" Noun}
-f {D 72; P 554.4:0}
-l {D 45; P 554.4:0}
-1IY {D 675; P 554.4:0}
-z {D 102; P 554.4:0}
+f {D 72; P 440:0}
+l {D 45; P 440:0}
+1IY {D 675; P 440:0}
+z {D 102; P 440:0}
 . {D 6}
 ```
 

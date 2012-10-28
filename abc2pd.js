@@ -41,7 +41,7 @@ ABC.tools = {
 	return (quotient * 12 + strictHeight) - 1200;
     },
     frequency : function(height, acc) {
-	n = height - 5; // half steps up from A 440
+	n = height - 9; // half steps up from A 440
 	if ('dbl_flat' == acc) n -= 2;
 	if ('flat' == acc) n -= 1;
 	if ('sharp' == acc) n += 1;
