@@ -70,6 +70,24 @@ Syllables = {
 	    return s
 	}
 
+	entry.description = function() {
+	    var p = []
+	    this.pitches.forEach(function(pitch) { 
+		p.push("[" + pitch[0] + ", " + pitch[1] + "]")
+	    })
+	    var s = [
+		"{",
+		"  raw: " + this.raw,
+		"  type: " + this.type,
+		"  symbol: " + this.symbol,
+		"  duration: " + this.duration,
+		"  pitches: [ " + p.join(", ") + "]",
+		"  sylBreak: " + this.sylBreak,
+		"}",
+	    ].join("\n")
+	    return s
+	}
+
 	return entry
     },
 
