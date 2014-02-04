@@ -10,9 +10,9 @@ function getPhonemes(text, voice) {
     opt = { output: '' }
 
     if (voice === undefined)
-	runCommand('phonemes', '-t', text, opt)
+      runCommand('./phonemes', '-t', text, opt)
     else
-	runCommand('phonemes', '-t', '-v', voice, text, opt)
+      runCommand('./phonemes', '-t', '-v', voice, text, opt)
 	
     return opt.output;
 }
